@@ -45,6 +45,7 @@ def load_game_with_platform(monkeypatch, platform_name="linux", spatial=None):
     monkeypatch.setenv("KIVY_WINDOW", "mock")
     # Patch kivy.utils.platform
     import kivy.utils as ku
+
     monkeypatch.setattr(ku, "platform", platform_name, raising=False)
     # Ensure our module sees patched platform
     mod = importlib.import_module("main")
@@ -52,12 +53,12 @@ def load_game_with_platform(monkeypatch, platform_name="linux", spatial=None):
     game = mod.CrazyBotGame()
     # Inject HW with given spatial when android
     if platform_name == "android":
-        hw = mod.HW()
+        hw = mod.HWAndroid()
         hw.hardware = spatial
         game.hw = hw
     else:
         # Linux: avoid serial usage
-        hw = mod.HW()
+        hw = mod.HWLinux()
         hw.device = None
         game.hw = hw
     # Inject dummy sliders
@@ -97,7 +98,9 @@ def test_get_compass_scaling_android(monkeypatch, roll, pitch, exp_turn, exp_pow
         (100, 25, 50, 100, 84, 157),
     ],
 )
-def test_get_motor_data(monkeypatch, z, y, power_scale, turn_scale, exp_left, exp_right):
+def test_get_motor_data(
+    monkeypatch, z, y, power_scale, turn_scale, exp_left, exp_right
+):
     mod, game = load_game_with_platform(monkeypatch, "linux")
     game.ids.powersl.value = power_scale
     game.ids.turnsl.value = turn_scale
