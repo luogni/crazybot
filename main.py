@@ -11,16 +11,16 @@ __version__ = "0.2"
 
 class CrazyBotGame(Widget):
 
-    orient1 = NumericProperty(0)
-    orient2 = NumericProperty(0)
-    m1 = StringProperty("")
-    m2 = StringProperty("")
+    c_turn = NumericProperty(0)
+    c_power = NumericProperty(0)
+    motors = StringProperty("")
+    wheel = StringProperty("")
     reverse = NumericProperty(0)
     device = StringProperty("nothing")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.hw: HW | None = None
+        self.hw: HW = HWFactory.get(platform)
 
     def get_motor_data(self, z: int, y: int, r: int):
         """
@@ -55,47 +55,39 @@ class CrazyBotGame(Widget):
             right = int(round(base_power * (1.0 - scaled)))
         elif turn_input > 0:
             left = int(round(base_power * (1.0 - scaled)))
-        self.m1 = "%d %d" % (int(left), self.orient1)
-        self.m2 = "%d %d" % (int(right), self.orient2)
-        self.device = "%d / %d" % (tpower, tturn)
+        self.motors = "%d %d" % (int(left), int(right))
+        self.wheel = "%d %d" % (self.c_power, self.c_turn)
+        # self.device = "%d / %d" % (tpower, tturn)
         # Use reverse flag to invert direction instead of modifying motor values
         r = 0 if r else 1
         return int(left), int(right), r
 
     def send_data(self, data):
-        if self.hw:
-            payload = "42,%d,119,%s," % (
-                len(data) + 1,
-                ",".join([str(a) for a in data]),
-            )
-            self.hw.send_data(payload, 200)
+        payload = "42,%d,119,%s," % (
+            len(data) + 1,
+            ",".join([str(a) for a in data]),
+        )
+        self.hw.send_data(payload, 200)
 
     def update(self, dt):
-        if self.hw:
-            (self.orient1, self.orient2) = self.hw.get_compass()
-            v1, v2, r = self.get_motor_data(self.orient2, self.orient1, self.reverse)
-            self.send_data([v1, v2, r])
-
-    def init_hw(self):
-        self.hw = HWFactory.get(platform)
+        cwheel = self.hw.get_control_wheel()
+        (self.c_turn, self.c_power) = (cwheel.turn, cwheel.power)
+        v1, v2, r = self.get_motor_data(self.c_power, self.c_turn, self.reverse)
+        self.send_data([v1, v2, r])
 
     def check_hw(self, dt):
-        if self.hw:
-            self.hw.check()
+        self.hw.check_and_load()
 
     def _stop(self):
-        if self.hw:
-            self.hw.stop()
+        self.hw.stop()
 
     def _start(self):
-        if self.hw:
-            self.hw.start()
+        self.hw.start()
 
 
 class CrazyBotApp(App):
     def build(self):
         self._game: CrazyBotGame = CrazyBotGame()
-        self._game.init_hw()
         Clock.schedule_interval(self._game.update, 1.0 / 60.0)
         Clock.schedule_interval(self._game.check_hw, 5.0)
         return self._game

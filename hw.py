@@ -1,6 +1,21 @@
 import math
 from typing import override
 from abc import abstractmethod, ABC
+from dataclasses import dataclass
+
+
+@dataclass
+class ControlWheel:
+    """
+    About where do I want to go and how fast
+
+    Attributes:
+       turn (int): -50 to 50
+       power (int): 0 to 100
+    """
+
+    turn: int = 0
+    power: int = 0
 
 
 class HW(ABC):
@@ -15,6 +30,10 @@ class HW(ABC):
     def get_compass(self) -> tuple[int, int]:
         o_turn, o_power = 0, 0
         return o_turn, o_power
+
+    def get_control_wheel(self) -> ControlWheel:
+        (t, p) = self.get_compass()
+        return ControlWheel(turn=t, power=p)
 
     @abstractmethod
     def send_data(self, data, timeout):

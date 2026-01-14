@@ -55,12 +55,12 @@ def load_game_with_platform(monkeypatch, platform_name="linux", spatial=None):
     # Inject HW with given spatial when android
     if platform_name == "android":
         hw = modhw.HWAndroid()
-        hw.hardware = spatial
+        hw._hardware = spatial
         game.hw = hw
     else:
         # Linux: avoid serial usage
         hw = modhw.HWLinux()
-        hw.device = None
+        hw._device = None
         game.hw = hw
     # Inject dummy sliders
     game.ids = DummyIds(powersl=DummySlider(70), turnsl=DummySlider(40))
