@@ -49,16 +49,17 @@ def load_game_with_platform(monkeypatch, platform_name="linux", spatial=None):
     monkeypatch.setattr(ku, "platform", platform_name, raising=False)
     # Ensure our module sees patched platform
     mod = importlib.import_module("main")
+    modhw = importlib.import_module("hw")
     importlib.reload(mod)
     game = mod.CrazyBotGame()
     # Inject HW with given spatial when android
     if platform_name == "android":
-        hw = mod.HWAndroid()
+        hw = modhw.HWAndroid()
         hw.hardware = spatial
         game.hw = hw
     else:
         # Linux: avoid serial usage
-        hw = mod.HWLinux()
+        hw = modhw.HWLinux()
         hw.device = None
         game.hw = hw
     # Inject dummy sliders
