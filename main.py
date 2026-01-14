@@ -3,7 +3,7 @@ from kivy.uix.widget import Widget
 from kivy.clock import Clock
 from kivy.properties import NumericProperty, StringProperty
 from kivy.utils import platform
-
+from kivy.core.window import Window
 from hw import HW, HWFactory
 
 __version__ = "0.2"
@@ -20,6 +20,7 @@ class CrazyBotGame(Widget):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        Window.bind(on_keyboard=self._on_keyboard)
         self.hw: HW = HWFactory.get(platform)
 
     def get_motor_data(self, z: int, y: int, r: int):
@@ -83,6 +84,10 @@ class CrazyBotGame(Widget):
 
     def _start(self):
         self.hw.start()
+
+    def _on_keyboard(self, instance, key, scancode, codepoint, modifiers):
+        print("Keyboard pressed! {}".format(key))
+        self.hw.handle_key(key)
 
 
 class CrazyBotApp(App):

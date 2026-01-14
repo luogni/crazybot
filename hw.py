@@ -47,6 +47,10 @@ class HW(ABC):
     def start(self):
         pass
 
+    @abstractmethod
+    def handle_key(self, key: int):
+        pass
+
 
 class HWFactory:
     @staticmethod
@@ -131,12 +135,18 @@ class HWAndroid(HW):
                 o_turn = int((v_roll + math.pi / 2) * (100.0 / math.pi)) - 50
         return o_turn, o_power
 
+    @override
+    def handle_key(self, key: int):
+        return
+
 
 class HWLinux(HW):
 
     def __init__(self):
         super().__init__()
         self._device = None
+        self._o_turn = 0
+        self._o_power = 0
 
     @override
     def send_data(self, data: str, timeout: int):
@@ -157,8 +167,7 @@ class HWLinux(HW):
 
     @override
     def get_compass(self) -> tuple[int, int]:
-        o_turn, o_power = 0, 0
-        return o_turn, o_power
+        return self._o_turn, self._o_power
 
     @override
     def stop(self):
@@ -168,3 +177,21 @@ class HWLinux(HW):
     @override
     def start(self):
         pass
+
+    @override
+    def handle_key(self, key: int):
+        # up = 273
+        # down = 274
+        # right = 275
+        # left = 276
+        if key == 273:
+            self._o_power += 4
+        elif key == 274:
+            self._o_power -= 4
+        elif key == 275:
+            self._o_turn += 4
+        elif key == 276:
+            self._o_turn -= 4
+
+        self._o_power = min(100, max(0, self._o_power))
+        self._o_turn = min(50, max(-50, self._o_turn))
