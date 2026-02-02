@@ -1,4 +1,4 @@
-from typing import override
+# from typing import override
 from hw import HW
 from serial import Serial, SerialException
 
@@ -11,12 +11,12 @@ class HWLinux(HW):
         self._o_turn: int = 0
         self._o_power: int = 0
 
-    @override
+    # @override
     def send_data(self, data: str, timeout: int):
         if self._device:
             _ = self._device.write(data.encode())
 
-    @override
+    # @override
     def check_and_load(self) -> None:
         super().check_and_load()
 
@@ -26,20 +26,20 @@ class HWLinux(HW):
             print("Disable hardware support")
             print(e)
 
-    @override
+    # @override
     def get_compass(self) -> tuple[int, int]:
         return self._o_turn, self._o_power
 
-    @override
+    # @override
     def stop(self):
         if self._device:
             self._device.close()
 
-    @override
+    # @override
     def start(self):
         pass
 
-    @override
+    # @override
     def handle_key(self, key: int):
         # up = 273
         # down = 274

@@ -1,5 +1,6 @@
 from hw import HW
-from typing import override
+
+# from typing import override
 from usb4a import usb
 from usbserial4a import serial4a
 from plyer import spatialorientation
@@ -13,7 +14,7 @@ class HWAndroid(HW):
         self._device = None
         self._hardware = None
 
-    @override
+    # @override
     def check_and_load(self) -> None:
         super().check_and_load()
 
@@ -38,24 +39,24 @@ class HWAndroid(HW):
             print("Disable hardware support")
             print(e)
 
-    @override
+    # @override
     def send_data(self, data: str, timeout: int):
         if self._device:
             self._device.write(data.encode())
 
-    @override
+    # @override
     def start(self):
         if self._hardware:
             self._hardware.enable_listener()
 
-    @override
+    # @override
     def stop(self):
         if self._hardware:
             self._hardware.disable_listener()
         if self._device:
             self._device.close()
 
-    @override
+    # @override
     def get_compass(self) -> tuple[int, int]:
         """
         On Android, read phone orientation and scale values for control:
@@ -75,6 +76,6 @@ class HWAndroid(HW):
                 o_turn = int((v_roll + math.pi / 2) * (100.0 / math.pi)) - 50
         return o_turn, o_power
 
-    @override
+    # @override
     def handle_key(self, key: int):
         return

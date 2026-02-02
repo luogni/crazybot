@@ -3,14 +3,6 @@ set dotenv-load := true
 default:
     @just --list
 
-# android-init:
-#     #!/usr/bin/env bash
-#     set -euxo pipefail
-#     mkdir -p .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/dists/crazybot/src/main/res/xml
-#     # cp intent-filter.xml .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/dists/crazybot/src/main/res/xml
-#     cp device_filter.xml .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/dists/crazybot/src/main/res/xml
-#     echo "Change .buildozer/android/platform/build-arm64-v8a_armeabi-v7a/dists/crazybot/templates/AndroidManifest.tmpl.xml"
-
 android-run: (android-cmd "deploy run logcat")
 
 android-logcat: (android-cmd "logcat")
@@ -30,3 +22,8 @@ pytest:
     set -euxo pipefail
     uv run -q pytest -q
 
+adb-install:
+    adb install bin/crazybot-0.2-arm64-v8a_armeabi-v7a-debug.apk
+
+adb-logcat:
+    adb logcat
